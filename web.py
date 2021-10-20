@@ -1,4 +1,7 @@
+import pprint
 import socket
+
+url  = "http://example.org/index.html"
 
 def request(url):
     s = socket.socket(
@@ -22,10 +25,10 @@ def request(url):
     # makefile returns a file-like object containing every byte receieved from the server. Turning those bytes into a string using utf8 encoding. Also removing HTTP's weird line endings.
     response = s.makefile("r", encoding="utf8", newline="\r\n")
     statusline = response.readline()
-    print("statusline", statusline)
+    #print("statusline", statusline)
     version, status, explanation = statusline.split(" ", 2)
     assert status == "200", "{}:{}".format(status,explanation)
-    print({"version":version, "status":status,"explanation":explanation})
+    #print({"version":version, "status":status,"explanation":explanation})
 
     headers = {}
     while True:
@@ -34,7 +37,35 @@ def request(url):
         print(line)
         header, value = line.split(":",1)
         headers[header.lower()] = value.strip()
-    print(headers)
+    #print(headers)
+    
+    body = response.read()
+    s.close()
+    return headers,body
+    
 
-url  = "http://example.org/index.html"
-request(url)
+def displayBody(body):
+    #print(body)
+
+    #Print info between the <> brackets in the response body.
+
+    in_angle = False
+    for c in body:
+        if c == "<style>": print(c)
+        if c == "<" or c == "{":
+            in_angle = True
+        elif c == ">" or c == "}":
+            in_angle = False
+        elif not in_angle:
+            print(c,end="")
+
+
+def load(url):
+    headers, body = request(url)
+    #print(headers)
+    displayBody(body)
+
+if __name__ == "__main__":
+    import sys
+    print(sys.argv[0])
+    load(sys.argv[1])
