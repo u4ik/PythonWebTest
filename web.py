@@ -1,10 +1,15 @@
 import pprint
 import socket
+import ssl
+
+
 
 url  = "http://example.org/index.html"
 
 def request(url):
+    ctx = ssl.create_default_context()
     s = socket.socket(
+
     family=socket.AF_INET,
     type=socket.SOCK_STREAM,
     proto=socket.IPPROTO_TCP,
@@ -51,7 +56,6 @@ def displayBody(body):
 
     in_angle = False
     for c in body:
-        if c == "<style>": print(c)
         if c == "<" or c == "{":
             in_angle = True
         elif c == ">" or c == "}":
