@@ -1,9 +1,6 @@
 import pprint
 import socket
 import ssl
-
-
-
 url  = "http://example.org/index.html"
 
 def request(url):
@@ -34,7 +31,6 @@ def request(url):
     version, status, explanation = statusline.split(" ", 2)
     assert status == "200", "{}:{}".format(status,explanation)
     #print({"version":version, "status":status,"explanation":explanation})
-
     headers = {}
     while True:
         line = response.readline()
