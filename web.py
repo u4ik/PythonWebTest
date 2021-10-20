@@ -1,7 +1,7 @@
 import pprint
 import socket
 import ssl
-url  = "http://example.org/index.html"
+# url  = "http://example.org/index.html"
 
 def request(url):
     ctx = ssl.create_default_context()
@@ -17,9 +17,9 @@ def request(url):
     url = url[len("http://"):]
     host, path = url.split("/", 1)
     path = "/" + path
-    print(host,path)
+    # print({"host":host, "path":path})
 
-    s.connect(("example.org", 80))
+    s.connect((host, 80))
     # Implementing the "b" before the string specifies that there are bytes of information being sent, instead of the raw text.
     # This send request returns back to us "47" which are the amount of bytes that we've sent
     print("Sent Bytes:",s.send(b"GET /index.html HTTP/1.0\r\n" + b"Host: example.org\r\n\r\n"))
@@ -47,9 +47,7 @@ def request(url):
 
 def displayBody(body):
     #print(body)
-
     #Print info between the <> brackets in the response body.
-
     in_angle = False
     for c in body:
         if c == "<" or c == "{":
@@ -67,5 +65,6 @@ def load(url):
 
 if __name__ == "__main__":
     import sys
-    print(sys.argv[0])
-    load(sys.argv[1])
+    if sys.argv[1]:
+        load(sys.argv[1])
+    
