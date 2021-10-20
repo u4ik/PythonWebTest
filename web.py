@@ -5,7 +5,6 @@ import ssl
 # ? Test URL
 # url = "http://example.org/index.html"
 
-
 def request(url):
     s = socket.socket(
         family=socket.AF_INET,
@@ -72,7 +71,6 @@ def request(url):
     s.close()
     return headers, body
 
-
 def displayBody(body):
     # print(body)
     # Print info between the <> brackets in the response body.
@@ -86,12 +84,10 @@ def displayBody(body):
 
             print(c, end="")
 
-
 def load(url):
     headers, body = request(url)
     # print(headers)
     displayBody(body)
-
 
 # ? Test Load
 # load(url)
