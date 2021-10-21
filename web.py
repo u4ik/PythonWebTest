@@ -12,15 +12,21 @@ def request(url):
         proto=socket.IPPROTO_TCP,
     )
 
+    # Scheme = http, or https
     scheme, url = url.split("://", 1)
     hostname = url.split("/", 1)[0]
-    # print(hostname)
+    print(hostname)
     assert scheme in ["http", "https"], \
         "Unknown scheme {}".format(scheme)
     port = 80 if scheme == "http" else 443
 
-    host, path = url.split("/", 1)
-    path = "/" + path
+    host = url.split("/", 1)[0]
+    path = ""
+
+    if len(url.split("/", 1)) == 2:
+        __, path = url.split("/", 1)
+        path = "/" + path
+    
     # Wrapping the initial socket connection for SSL, this same "s" variable will be used for a connection.
     if scheme == "https":
         ctx = ssl.create_default_context()
@@ -32,19 +38,22 @@ def request(url):
         port = int(port)
 
     print({
-        "host": host,
-        "path": path,
-        "url": url,
         "hostname": hostname,
+        "host": host,
+        "path": path if path else "",
+        "url": url,
         "port": port,
         "scheme": scheme
           })
     s.connect((hostname, port))
     # Implementing the "b" before the string specifies that there are bytes of information being sent, instead of the raw text.
-    # This send request returns back to us "47" which are the amount of bytes that we've sent
-    rOpt1 = f"GET /index.html HTTP/1.0\r\n"
+    # This send request returns back to us "47" which represent the amount of bytes.
+    rOpt1 = f"GET / HTTP/1.0\r\n"
     rOpt2 = f'Host: {hostname}\r\n\r\n'
-    options = rOpt1 + rOpt2
+    rOpt3 = f'Connection: close\r\n'
+    rOpt4 = f'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:50.0) Gecko/20100101 Firefox/50.0'
+    options = rOpt1 + rOpt2 + rOpt3 + rOpt4
+    print(options)
     print("Sent Bytes:",
           s.send(
               options.encode()
@@ -56,16 +65,16 @@ def request(url):
     #print("statusline", statusline)
     version, status, explanation = statusline.split(" ", 2)
     assert status == "200", "{}:{}".format(status, explanation)
-    print({"version": version, "status": status, "explanation": explanation})
+    # print({"version": version, "status": status, "explanation": explanation})
     headers = {}
     while True:
         line = response.readline()
         if line == "\r\n":
             break
-        print(line)
+        # print(line)
         header, value = line.split(":", 1)
         headers[header.lower()] = value.strip()
-    # print(headers)
+    print(headers)
 
     body = response.read()
     s.close()
@@ -74,6 +83,8 @@ def request(url):
 def displayBody(body):
     # print(body)
     # Print info between the <> brackets in the response body.
+    bodyParsed = []
+
     in_angle = False
     for c in body:
         if c == "<" or c == "{":
@@ -81,8 +92,11 @@ def displayBody(body):
         elif c == ">" or c == "}":
             in_angle = False
         elif not in_angle:
-
-            print(c, end="")
+            bodyParsed.append(c)
+            # print(c,end="")
+        # print(c, end="")
+    
+    print(''.join(bodyParsed))
 
 def load(url):
     headers, body = request(url)
